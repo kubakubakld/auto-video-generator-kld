@@ -8,14 +8,12 @@ def create_text_image(text, out_path, size=(1080, 1920), bg_color=(20,20,20), te
     img = Image.new("RGB", size, color=bg_color)
     draw = ImageDraw.Draw(img)
 
-    # Try to load a common font; fallback to default if not available
     try:
         font = ImageFont.truetype("DejaVuSans-Bold.ttf", fontsize)
     except Exception:
         font = ImageFont.load_default()
 
-    # Wrap text to fit width
-    max_width = size[0] - 2*margin
+    # Wrap text to reasonable line length
     lines = []
     for paragraph in text.split("\n"):
         wrapped = textwrap.wrap(paragraph, width=40)
@@ -24,14 +22,16 @@ def create_text_image(text, out_path, size=(1080, 1920), bg_color=(20,20,20), te
         else:
             lines.extend(wrapped)
 
-    # Calculate total text height
-    line_height = font.getsize("Ay")[1] + 10
+    # Calculate line height using textbbox
+    bbox = draw.textbbox((0, 0), "Ay", font=font)
+    line_height = (bbox[3] - bbox[1]) + 10
+
     total_height = line_height * len(lines)
 
-    # Start drawing vertically centered
     y = (size[1] - total_height) // 2
     for line in lines:
-        w, h = draw.textsize(line, font=font)
+        bbox_line = draw.textbbox((0, 0), line, font=font)
+        w = bbox_line[2] - bbox_line[0]
         x = (size[0] - w) // 2
         draw.text((x, y), line, font=font, fill=text_color)
         y += line_height
