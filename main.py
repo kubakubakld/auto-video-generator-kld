@@ -6,8 +6,7 @@ def generate_video(text):
     clip = ColorClip(size=(1080, 1920), color=(20, 20, 20), duration=8)
 
     # Text overlay
-    txt = TextClip(text, fontsize=80, color='white', font='Arial-Bold', method='caption')
-
+    txt = TextClip(text, fontsize=80, color='white', font='Arial-Bold', method='pillow')
     txt = txt.set_position('center').set_duration(8)
 
     # Composite
